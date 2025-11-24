@@ -1,7 +1,7 @@
 const { calculatePortfolio } = require("./portfolio");
 
 const user1 = [
-    { name: "TCS", weightage: 30, initialPrice: 3500, currentPrice: 3800, role: "captain" },
+    { name: "TCS", weightage: 30, initialPrice: 3000, currentPrice: 3800, role: "captain" },
     { name: "Infosys", weightage: 25, initialPrice: 1500, currentPrice: 1600, role: "vice" },
     { name: "HDFC", weightage: 25, initialPrice: 1600, currentPrice: 1550, role: "regular" },
     { name: "Reliance", weightage: 20, initialPrice: 2400, currentPrice: 2500, role: "regular" }
@@ -34,3 +34,4 @@ const tieUsers = [
 
 console.log("Tie Test:");
 console.log(rankingUsers(tieUsers));
+
