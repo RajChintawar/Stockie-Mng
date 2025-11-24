@@ -12,7 +12,7 @@ console.log(calculateStock(sampleStock));
 const { calculatePortfolio} = require("../portfolio");
 const userstock =[
     {
-        name:"TCS",weightage:30,initialPrice:3500,currentPrice:3800,role:"captain"
+        name:"TCS",weightage:30,initialPrice:3000,currentPrice:3800,role:"captain"
     },
     {
         name:"Infosys",weightage:25,initialPrice:1500,currentPrice:1600,role:"vice"
@@ -37,5 +37,6 @@ const result = [
     { name: "User2", totalValue: 118000 },
     { name : "User3", totalValue : 120000},
 ];
+
 
 console.log(rankingUsers(result));
