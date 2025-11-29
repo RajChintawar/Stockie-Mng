@@ -1,37 +1,88 @@
 const express = require("express");
 const cors = require("cors");
+const mongoose = require("mongoose");
 
+require("dotenv").config();
+
+const app = express();
+app.use(express.json());
+app.use(cors());
+
+// --------------------
+// 1. CONNECT TO DB
+// --------------------
+mongoose
+  .connect(process.env.DB_URI, {
+    dbName: "StockieDB",
+  })
+  .then(() => console.log("MongoDB connected ✔"))
+  .catch((err) => console.log("DB Error ❌", err));
+
+// --------------------
+// 2. USER SCHEMA
+// --------------------
+const userSchema = new mongoose.Schema({
+  name: { type: String, required: true },
+  totalValue: { type: Number, required: true },
+});
+
+const User = mongoose.model("User", userSchema);
+
+// --------------------
+// 3. CALCULATION LOGIC
+// --------------------
 const { calculatePortfolio } = require("./portfolio");
 const { rankingUsers } = require("./ranking");
 
-const app = express();
-app.use(cors());
-app.use(express.json());
-
-// Test route
-app.get("/", (req, res) => {
-  res.send("Backend is running!");
-});
-
-// Calculate portfolio
-app.post("/calculate-portfolio", (req, res) => {
+// --------------------
+// 4. SAVE USER PORTFOLIO
+// --------------------
+app.post("/save-portfolio", async (req, res) => {
   try {
-    const result = calculatePortfolio(req.body.stocks);
-    res.json(result);
+    const { name, stocks } = req.body;
+
+    if (!name || !stocks)
+      return res.json({ error: "Name and stocks are required" });
+
+    const result = calculatePortfolio(stocks);
+
+    // save/update user
+    await User.findOneAndUpdate(
+      { name },
+      { totalValue: result.totalValue },
+      { upsert: true, new: true }
+    );
+
+    res.json({ success: true, result });
   } catch (err) {
-    res.status(400).json({ error: err.message });
+    console.log(err);
+    res.json({ error: "Failed to save portfolio" });
   }
 });
 
-// Ranking route
-app.post("/rank-users", (req, res) => {
+// --------------------
+// 5. GET REAL RANKINGS
+// --------------------
+app.get("/get-rankings", async (req, res) => {
   try {
-    const ranked = rankingUsers(req.body.users);
+    const users = await User.find({});
+
+    const ranked = rankingUsers(users);
+
     res.json(ranked);
   } catch (err) {
-    res.status(400).json({ error: err.message });
+    console.log(err);
+    res.json({ error: "Failed to fetch rankings" });
   }
 });
 
-const PORT = process.env.PORT || 5000;
-app.listen(PORT, () => console.log(`Server running on ${PORT}`));
+// --------------------
+// 6. TEST ROUTE
+// --------------------
+app.get("/", (req, res) => {
+  res.send("Backend is LIVE 🚀");
+});
+
+// --------------------
+app.listen(3000, () => console.log("Server running on 3000 ✔"));
+
