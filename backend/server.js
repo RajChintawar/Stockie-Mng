@@ -91,25 +91,34 @@ app.get("/", (req, res) => {
  // 7. AI SUGGESTION
  //-------------------
  // Backend
-const client = new OpenAI({ apiKey: process.env.OPENAI_API_KEY});
-
+const client = new OpenAI({
+  apiKey: process.env.OPENAI_API_KEY
+});
 
 app.post("/ai-suggest", async (req, res) => {
   try {
     const { stocks } = req.body;
 
-    const completion = await client.chat.completions.create({
+    const response = await client.chat.completions.create({
       model: "gpt-4o-mini",
       messages: [
-        { role: "user", content: `Analyze portfolio: ${JSON.stringify(stocks)}` }
+        {
+          role: "user",
+          content: `Analyze this portfolio and give suggestions: ${JSON.stringify(stocks)}`
+        }
       ]
     });
 
-    res.json({ suggestion: completion.choices[0].message.content });
+    // Extract text safely
+    const suggestion =
+      response.choices?.[0]?.message?.content ||
+      "No suggestion available.";
+
+    res.json({ suggestion });
 
   } catch (err) {
-    console.error(err);
-    res.status(500).json({ error: "AI Suggestion failed" });
+    console.error("AI ERROR:", err);
+    res.status(500).json({ error: "AI Suggestion failed." });
   }
 });
 
