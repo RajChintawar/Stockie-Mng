@@ -100,19 +100,14 @@ app.post("/ai-suggest", async (req, res) => {
   try {
     const { stocks } = req.body;
 
-    const response = await client.chat.completions.create({
+    const response = await client.responses.create({
       model: "gpt-4o-mini",
-      messages: [
-        {
-          role: "user",
-          content: `Analyze this portfolio and give suggestions: ${JSON.stringify(stocks)}`
-        }
-      ]
+      input: `Analyze this portfolio and give suggestions: ${JSON.stringify(stocks)}`
     });
 
-    // Extract text safely
     const suggestion =
-      response.choices?.[0]?.message?.content ||
+      response.output_text || 
+      response.output?.[0]?.content?.[0]?.text || 
       "No suggestion available.";
 
     res.json({ suggestion });
@@ -122,6 +117,7 @@ app.post("/ai-suggest", async (req, res) => {
     res.status(500).json({ error: "AI Suggestion failed." });
   }
 });
+
 
 
 app.listen(3000, () => console.log("Server running on 3000 ✔"));
