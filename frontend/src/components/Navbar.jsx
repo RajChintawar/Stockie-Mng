@@ -1,19 +1,46 @@
+import { useState } from "react";
 import { Link } from "react-router-dom";
 
 export default function Navbar() {
+  const [open, setOpen] = useState(false);
+
   return (
-    <nav className="w-full bg-[#13151d] border-b border-[#1f2230] px-8 py-4 shadow-lg flex items-center justify-between sticky top-0 z-50">
-      <h1 className="text-2xl font-bold bg-gradient-to-r from-blue-400 to-green-400 bg-clip-text text-transparent">
-        Stockie
-      </h1>
+    <nav className="bg-[#151821] border-b border-white/10 p-4">
+      <div className="max-w-6xl mx-auto flex items-center justify-between">
 
-      <div className="flex gap-6 text-lg">
-        <Link to="/" className="hover:text-blue-400 transition">Dashboard</Link>
-        <Link to="/portfolio" className="hover:text-blue-400 transition">Portfolio</Link>
-        <Link to="/rankings" className="hover:text-blue-400 transition">Rankings</Link>
-        <Link to="/suggestion" className="hover:text-blue-400">AI Advice</Link>
+        {/* LOGO */}
+        <Link to="/" className="text-2xl font-bold text-white">
+          Stockie
+        </Link>
 
+        {/* DESKTOP MENU */}
+        <div className="hidden md:flex gap-8 text-gray-300 text-lg">
+          <Link to="/" className="hover:text-blue-400 transition">Dashboard</Link>
+
+          <Link to="/portfolio" className="hover:text-white">Portfolio</Link>
+          <Link to="/rankings" className="hover:text-white">Rankings</Link>
+          <Link to="/suggestion" className="hover:text-white">AI Advice</Link>
+        </div>
+
+        {/* MOBILE MENU BUTTON */}
+        <button
+          className="md:hidden text-white text-3xl"
+          onClick={() => setOpen(!open)}
+        >
+          ☰
+        </button>
       </div>
+
+      {/* MOBILE DROPDOWN MENU */}
+      {open && (
+        <div className="md:hidden mt-3 bg-[#1b1f27] p-4 rounded-xl space-y-4 text-gray-200 text-lg">
+         <Link onClick={() => setOpen(false)} to="/" className="block">Dashboard</Link>
+
+          <Link onClick={() => setOpen(false)} to="/portfolio" className="block">Portfolio</Link>
+          <Link onClick={() => setOpen(false)} to="/rankings" className="block">Rankings</Link>
+          <Link onClick={() => setOpen(false)} to="/suggestion" className="block">AI Advice</Link>
+        </div>
+      )}
     </nav>
   );
 }
