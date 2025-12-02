@@ -1,11 +1,16 @@
+
+
+
+
+require("dotenv").config();
+
+
 const express = require("express");
 const cors = require("cors");
 const mongoose = require("mongoose");
 const OpenAI = require("openai");
 
 console.log("OPENAI LOADED?", process.env.OPENAI_API_KEY ? "YES" : "NO");
-
-require("dotenv").config();
 
 const app = express();
 app.use(express.json());
@@ -100,14 +105,36 @@ app.post("/ai-suggest", async (req, res) => {
   try {
     const { stocks } = req.body;
 
+    if (!stocks || stocks.length === 0) {
+      return res.status(400).json({ error: "No portfolio data received." });
+    }
+
+    const prompt = `
+Analyze the following stock portfolio:
+
+${stocks.map(s => `${s.name} - Weight: ${s.weightage}%, Initial: ₹${s.initialPrice}, Current: ₹${s.currentPrice}`).join("\n")}
+
+Provide:
+1. Strengths of this portfolio
+2. Weaknesses
+3. Risk level
+4. Suggested improvements
+5. Recommended asset allocation (Equity %, Debt %, Gold %, Cash %)
+`;
+
     const response = await client.responses.create({
       model: "gpt-4o-mini",
-      input: `Analyze this portfolio and give suggestions: ${JSON.stringify(stocks)}`
+      input: [
+        {
+          role: "user",
+          content: prompt
+        }
+      ]
     });
 
     const suggestion =
-      response.output_text || 
-      response.output?.[0]?.content?.[0]?.text || 
+      response.output_text ||
+      response.output?.[0]?.content?.[0]?.text ||
       "No suggestion available.";
 
     res.json({ suggestion });
@@ -117,6 +144,7 @@ app.post("/ai-suggest", async (req, res) => {
     res.status(500).json({ error: "AI Suggestion failed." });
   }
 });
+
 
 
 

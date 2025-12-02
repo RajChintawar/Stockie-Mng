@@ -1,7 +1,11 @@
 import { useState, useContext } from "react";
 import { PortfolioContext } from "../context/PortfolioContext";
+import { useNavigate } from "react-router-dom";
+
 
 export default function Portfolio() {
+  const navigate = useNavigate();
+
   const {
     portfolioResult,
     setPortfolioResult,
@@ -94,6 +98,28 @@ export default function Portfolio() {
     localStorage.removeItem("portfolioStocks");
     localStorage.removeItem("portfolioResult");
   };
+
+const getAISuggestion = () => {
+  if (portfolioStocks.length === 0) {
+    setError("Add some damn stocks first 😭🔥");
+    return;
+  }
+
+  fetch("https://stockie-mng-backend.onrender.com/ai-suggest", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ stocks: portfolioStocks }),
+  })
+    .then((res) => res.json())
+    .then((data) => {
+      if (data.error) setError(data.error);
+      else alert(data.suggestion); // TEMP DISPLAY
+    })
+    .catch(() => setError("AI backend exploded 💀"));
+};
+
+
+
 
   return (
     <div className="p-8 max-w-6xl mx-auto text-white space-y-10">
@@ -222,6 +248,13 @@ export default function Portfolio() {
             >
               Calculate Portfolio
             </button>
+
+
+
+
+
+           
+
 
             <button
               onClick={clearAll}
