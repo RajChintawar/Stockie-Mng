@@ -12,16 +12,16 @@ const router = createBrowserRouter([
     element: (
       <div>
         <Navbar />
-        <Dashboard />
+        <Portfolio />
       </div>
     ),
   },
   {
-    path: "/portfolio",
+    path: "/Dashboard",
     element: (
       <div>
         <Navbar />
-        <Portfolio />
+        <Dashboard />
       </div>
     ),
   },
