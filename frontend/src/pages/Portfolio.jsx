@@ -249,13 +249,6 @@ const getAISuggestion = () => {
               Calculate Portfolio
             </button>
 
-
-
-
-
-           
-
-
             <button
               onClick={clearAll}
               className="bg-red-600 px-6 py-2 rounded-xl font-semibold hover:bg-red-700 transition shadow-lg"
