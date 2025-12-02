@@ -15,9 +15,9 @@ export default function Navbar() {
 
         {/* DESKTOP MENU */}
         <div className="hidden md:flex gap-8 text-gray-300 text-lg">
-          <Link to="/" className="hover:text-blue-400 transition">Dashboard</Link>
+          <Link to="/portfolio" className="hover:text-blue-400 transition">Portfolio</Link>
 
-          <Link to="/portfolio" className="hover:text-white">Portfolio</Link>
+          <Link to="/" className="hover:text-white">Dashboard</Link>
           <Link to="/rankings" className="hover:text-white">Rankings</Link>
           <Link to="/suggestion" className="hover:text-white">AI Advice</Link>
         </div>
@@ -34,9 +34,9 @@ export default function Navbar() {
       {/* MOBILE DROPDOWN MENU */}
       {open && (
         <div className="md:hidden mt-3 bg-[#1b1f27] p-4 rounded-xl space-y-4 text-gray-200 text-lg">
-         <Link onClick={() => setOpen(false)} to="/" className="block">Dashboard</Link>
+         <Link onClick={() => setOpen(false)} to="/portfolio" className="block">Portfolio</Link>
 
-          <Link onClick={() => setOpen(false)} to="/portfolio" className="block">Portfolio</Link>
+          <Link onClick={() => setOpen(false)} to="/" className="block">Dashboard</Link>
           <Link onClick={() => setOpen(false)} to="/rankings" className="block">Rankings</Link>
           <Link onClick={() => setOpen(false)} to="/suggestion" className="block">AI Advice</Link>
         </div>
