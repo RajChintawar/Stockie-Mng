@@ -3,6 +3,7 @@ const cors = require("cors");
 const mongoose = require("mongoose");
 const OpenAI = require("openai");
 
+console.log("OPENAI LOADED?", process.env.OPENAI_API_KEY ? "YES" : "NO");
 
 require("dotenv").config();
 
