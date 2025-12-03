@@ -2,15 +2,17 @@ import { useState, useContext } from "react";
 import { PortfolioContext } from "../context/PortfolioContext";
 import { useNavigate } from "react-router-dom";
 
-
 export default function Portfolio() {
   const navigate = useNavigate();
 
+  // FIX: useContext in **one place only**
   const {
     portfolioResult,
     setPortfolioResult,
     portfolioStocks,
     setPortfolioStocks,
+    totalAmount,
+    setTotalAmount
   } = useContext(PortfolioContext);
 
   const [error, setError] = useState("");
@@ -68,6 +70,11 @@ export default function Portfolio() {
       return;
     }
 
+    if (!totalAmount || totalAmount <= 0) {
+      setError("Enter a valid investment amount 😭🔥");
+      return;
+    }
+
     if (portfolioStocks.length === 0) {
       setError("Add at least ONE mf stock 😭🔥");
       return;
@@ -78,6 +85,7 @@ export default function Portfolio() {
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
         name: username,
+        totalAmount: totalAmount,
         stocks: portfolioStocks,
       }),
     })
@@ -94,32 +102,12 @@ export default function Portfolio() {
     setPortfolioResult(null);
     setError("");
     setUsername("");
+    setTotalAmount(0); // FIX: reset to number not string
 
     localStorage.removeItem("portfolioStocks");
     localStorage.removeItem("portfolioResult");
+    localStorage.removeItem("totalAmount");
   };
-
-const getAISuggestion = () => {
-  if (portfolioStocks.length === 0) {
-    setError("Add some damn stocks first 😭🔥");
-    return;
-  }
-
-  fetch("https://stockie-mng-backend.onrender.com/ai-suggest", {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ stocks: portfolioStocks }),
-  })
-    .then((res) => res.json())
-    .then((data) => {
-      if (data.error) setError(data.error);
-      else alert(data.suggestion); // TEMP DISPLAY
-    })
-    .catch(() => setError("AI backend exploded 💀"));
-};
-
-
-
 
   return (
     <div className="p-8 max-w-6xl mx-auto text-white space-y-10">
@@ -140,7 +128,16 @@ const getAISuggestion = () => {
           value={username}
           onChange={(e) => setUsername(e.target.value)}
           placeholder="Enter Your Name"
-          className="p-3 rounded-xl bg-[#1b1f27] border border-white/10 w-full focus:ring-2 focus:ring-purple-500 outline-none"
+          className="p-3 rounded-xl bg-[#1b1f27] border border-white/10 w-full"
+        />
+
+        {/* Total Amount */}
+        <input
+          value={totalAmount}
+          onChange={(e) => setTotalAmount(Number(e.target.value))}
+          placeholder="Enter Total Amount to be Invested (₹)"
+          className="p-3 rounded-xl bg-[#1b1f27] border border-white/10 w-full"
+          inputMode="numeric"
         />
 
         <h3 className="text-2xl font-semibold mb-4">Add Stock</h3>
@@ -151,7 +148,7 @@ const getAISuggestion = () => {
             value={form.name}
             onChange={handleChange}
             placeholder="Stock Name"
-            className="p-3 rounded-xl bg-[#1b1f27] border border-white/10 focus:ring-2 focus:ring-blue-500 outline-none"
+            className="p-3 rounded-xl bg-[#1b1f27] border border-white/10"
           />
 
           <input
@@ -160,7 +157,7 @@ const getAISuggestion = () => {
             onChange={handleChange}
             placeholder="Weight %"
             inputMode="numeric"
-            className="p-3 rounded-xl bg-[#1b1f27] border border-white/10 focus:ring-2 focus:ring-blue-500 outline-none"
+            className="p-3 rounded-xl bg-[#1b1f27] border border-white/10"
           />
 
           <input
@@ -169,7 +166,7 @@ const getAISuggestion = () => {
             onChange={handleChange}
             placeholder="Initial Price"
             inputMode="numeric"
-            className="p-3 rounded-xl bg-[#1b1f27] border border-white/10 focus:ring-2 focus:ring-blue-500 outline-none"
+            className="p-3 rounded-xl bg-[#1b1f27] border border-white/10"
           />
 
           <input
@@ -178,14 +175,14 @@ const getAISuggestion = () => {
             onChange={handleChange}
             placeholder="Current Price"
             inputMode="numeric"
-            className="p-3 rounded-xl bg-[#1b1f27] border border-white/10 focus:ring-2 focus:ring-blue-500 outline-none"
+            className="p-3 rounded-xl bg-[#1b1f27] border border-white/10"
           />
 
           <select
             name="role"
             value={form.role}
             onChange={handleChange}
-            className="p-3 rounded-xl bg-[#1b1f27] border border-white/10 focus:ring-2 focus:ring-blue-500 outline-none"
+            className="p-3 rounded-xl bg-[#1b1f27] border border-white/10"
           >
             <option value="regular">Regular</option>
             <option value="captain">Captain</option>

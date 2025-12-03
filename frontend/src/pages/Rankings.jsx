@@ -1,23 +1,25 @@
 import { useEffect, useState } from "react";
 
 export default function Rankings() {
-  const [rankings, setRankings] = useState(null);
+  const [rankings, setRankings] = useState([]);
 
+  // 🟢 FETCH RANKINGS FROM BACKEND
   useEffect(() => {
     fetch("https://stockie-mng-backend.onrender.com/get-rankings")
       .then((res) => res.json())
       .then((data) => setRankings(data))
-      .catch((err) => console.error(err));
+      .catch((err) => console.error("Rankings fetch error:", err));
   }, []);
 
-  if (!rankings)
+  if (!rankings.length) {
     return (
       <h2 className="text-white p-6 text-center text-xl">
         Loading rankings...
       </h2>
     );
+  }
 
-  // 🧠 SORT + ASSIGN RANKS
+  // 🧠 SORT + ADD RANK NUMBER
   const sorted = [...rankings]
     .sort((a, b) => b.totalValue - a.totalValue)
     .map((u, i) => ({
@@ -25,7 +27,7 @@ export default function Rankings() {
       rank: i + 1,
     }));
 
-  // 🥇 Medal Styles
+  // 🥇 Medal styles
   const getRankStyle = (rank) => {
     switch (rank) {
       case 1:
@@ -54,14 +56,12 @@ export default function Rankings() {
 
   // ⭐ NEW: Clear Data Button
   const clearLocalRankings = () => {
-    setRankings([]);  // only clears frontend, not Mongo
+    setRankings([]); // clears frontend only
   };
 
   return (
     <div className="p-8 max-w-6xl mx-auto text-white">
-      <h2 className="text-4xl font-bold tracking-tight mb-6">
-        Leaderboard
-      </h2>
+      <h2 className="text-4xl font-bold tracking-tight mb-6">Leaderboard</h2>
 
       <div className="p-6 rounded-2xl bg-[#151821]/70 backdrop-blur-xl border border-white/10 shadow-xl overflow-x-auto">
         <table className="min-w-[700px] w-full border-collapse">

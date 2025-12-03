@@ -2,7 +2,7 @@ import { useState, useContext } from "react";
 import { PortfolioContext } from "../context/PortfolioContext";
 
 export default function Suggestion() {
-  const { portfolioStocks } = useContext(PortfolioContext);
+const { portfolioStocks, totalAmount } = useContext(PortfolioContext);
   const [suggestion, setSuggestion] = useState(null);
   const [loading, setLoading] = useState(false);
 
@@ -17,7 +17,7 @@ export default function Suggestion() {
     fetch("https://stockie-mng-backend.onrender.com/ai-suggest", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ stocks: portfolioStocks }),
+body: JSON.stringify({ stocks: portfolioStocks, totalAmount }),
     })
       .then((res) => res.json())
       .then((data) => setSuggestion(data.suggestion))

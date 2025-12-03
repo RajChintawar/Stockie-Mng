@@ -3,22 +3,32 @@ import { createContext, useState, useEffect } from "react";
 export const PortfolioContext = createContext();
 
 export function PortfolioProvider({ children }) {
-  const [portfolioResult, setPortfolioResult] = useState(() => {
-    const saved = localStorage.getItem("portfolioResult");
-    return saved ? JSON.parse(saved) : null;
-  });
+
+  // Load saved amount (important)
+  const savedAmount = localStorage.getItem("totalAmount");
+  const [totalAmount, setTotalAmount] = useState(savedAmount ? Number(savedAmount) :0 );
 
   const [portfolioStocks, setPortfolioStocks] = useState(() => {
     const saved = localStorage.getItem("portfolioStocks");
     return saved ? JSON.parse(saved) : [];
   });
 
-  // Sync stocks to LocalStorage
+  const [portfolioResult, setPortfolioResult] = useState(() => {
+    const saved = localStorage.getItem("portfolioResult");
+    return saved ? JSON.parse(saved) : null;
+  });
+
+  // Save amount
+  useEffect(() => {
+    localStorage.setItem("totalAmount", totalAmount);
+  }, [totalAmount]);
+
+  // Save stocks
   useEffect(() => {
     localStorage.setItem("portfolioStocks", JSON.stringify(portfolioStocks));
   }, [portfolioStocks]);
 
-  // Sync results to LocalStorage
+  // Save result
   useEffect(() => {
     if (portfolioResult)
       localStorage.setItem("portfolioResult", JSON.stringify(portfolioResult));
@@ -27,10 +37,12 @@ export function PortfolioProvider({ children }) {
   return (
     <PortfolioContext.Provider
       value={{
-        portfolioResult,
-        setPortfolioResult,
+        totalAmount,
+        setTotalAmount,
         portfolioStocks,
         setPortfolioStocks,
+        portfolioResult,
+        setPortfolioResult,
       }}
     >
       {children}

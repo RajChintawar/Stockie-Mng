@@ -33,38 +33,49 @@ export default function Dashboard() {
 
   const result = portfolioResult;
 
+  // NEW METRICS
+  const invested = result.totalInvested;
+  const current = result.totalValue;
+  const growth = result.netGrowth;
+  const percent = ((growth / invested) * 100).toFixed(2);
+  const isProfit = growth >= 0;
+
   return (
-    <div className="p-8 max-w-6xl mx-auto text-white space-y-10">
+    <div className="p-4 sm:p-6 md:p-8 max-w-6xl mx-auto text-white space-y-10">
       {/* MAIN HEADING */}
-      <h2 className="text-4xl font-bold tracking-tight">Dashboard</h2>
+      <h2 className="text-3xl sm:text-4xl font-bold tracking-tight">Dashboard</h2>
 
       {/* STATS GRID */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
 
-        {/* CARD 1 */}
-        <div className="p-6 rounded-2xl bg-[#151821] hover:bg-[#1d2030] 
+        {/* TOTAL INVESTED */}
+        <div className="p-6 rounded-2xl bg-[#151821] hover:bg-[#1d2030]
         border border-white/10 shadow-lg transition">
-          <h3 className="text-lg text-gray-300">Total Value</h3>
-          <p className="text-3xl font-bold mt-2">
-            ₹{result.totalValue.toLocaleString()}
+          <h3 className="text-lg text-gray-300">Total Invested</h3>
+          <p className="text-3xl font-bold mt-2">₹{invested.toLocaleString()}</p>
+        </div>
+
+        {/* CURRENT VALUE */}
+        <div className="p-6 rounded-2xl bg-[#151821] hover:bg-[#1d2030]
+        border border-white/10 shadow-lg transition">
+          <h3 className="text-lg text-gray-300">Current Value</h3>
+          <p className="text-3xl font-bold mt-2">₹{current.toLocaleString()}</p>
+        </div>
+
+        {/* NET RETURN */}
+        <div className="p-6 rounded-2xl bg-[#151821] hover:bg-[#1d2030]
+        border border-white/10 shadow-lg transition">
+          <h3 className="text-lg text-gray-300">Net {isProfit ? "Profit" : "Loss"}</h3>
+
+          <p className={`text-3xl font-bold mt-2 ${isProfit ? "text-green-400" : "text-red-400"}`}>
+            {isProfit ? "+" : "-"}₹{Math.abs(growth).toLocaleString()}
+          </p>
+
+          <p className={`text-xl mt-1 ${isProfit ? "text-green-400" : "text-red-400"}`}>
+            {percent}%
           </p>
         </div>
 
-        {/* CARD 2 */}
-        <div className="p-6 rounded-2xl bg-[#151821] hover:bg-[#1d2030] 
-        border border-white/10 shadow-lg transition">
-          <h3 className="text-lg text-gray-300">Return %</h3>
-          <p className="text-3xl font-bold mt-2 text-green-400">
-            {result.portfolioReturnPercent.toFixed(2)}%
-          </p>
-        </div>
-
-        {/* CARD 3 */}
-        <div className="p-6 rounded-2xl bg-[#151821] hover:bg-[#1d2030] 
-        border border-white/10 shadow-lg transition">
-          <h3 className="text-lg text-gray-300">Stocks Count</h3>
-          <p className="text-3xl font-bold mt-2">{portfolioStocks.length}</p>
-        </div>
       </div>
 
       {/* PIE CHART */}
@@ -78,7 +89,7 @@ export default function Dashboard() {
             <PieChart>
               <Pie
                 data={result.stockResults.map((s, i) => ({
-                  name: portfolioStocks[i].name,
+                  name: portfolioStocks[i]?.name,
                   value: s.investmentAmount,
                 }))}
                 dataKey="value"
@@ -116,7 +127,7 @@ export default function Dashboard() {
           <ResponsiveContainer>
             <BarChart
               data={result.stockResults.map((s, i) => ({
-                name: portfolioStocks[i].name,
+                name: portfolioStocks[i]?.name,
                 finalReturn: s.finalReturn,
               }))}
             >
@@ -131,43 +142,42 @@ export default function Dashboard() {
         </div>
       </div>
 
-{/* LINE CHART: Portfolio Growth Over Time */}
-<div className="bg-[#151821] p-6 rounded-2xl border border-white/10 shadow-xl mt-10">
-  <h3 className="text-2xl font-semibold mb-4 text-gray-300">
-    Portfolio Performance (Simulated Growth)
-  </h3>
+      {/* LINE CHART */}
+      <div className="bg-[#151821] p-6 rounded-2xl border border-white/10 shadow-xl mt-10">
+        <h3 className="text-2xl font-semibold mb-4 text-gray-300">
+          Portfolio Performance (Simulated Growth)
+        </h3>
 
-  <div style={{ width: "100%", height: 350 }}>
-    <ResponsiveContainer>
-      <LineChart
-        data={[
-          { day: "Day 1", value: result.totalValue * 0.92 },
-          { day: "Day 2", value: result.totalValue * 0.95 },
-          { day: "Day 3", value: result.totalValue * 1.01 },
-          { day: "Day 4", value: result.totalValue * 1.03 },
-          { day: "Day 5", value: result.totalValue * 1.08 },
-          { day: "Today", value: result.totalValue },
-        ]}
-      >
-        <CartesianGrid strokeDasharray="3 3" stroke="#2a2e3f" />
-        <XAxis dataKey="day" stroke="#9aa0b5" />
-        <YAxis stroke="#9aa0b5" />
-        <Tooltip />
-        <Legend />
-
-        <Line
-          type="monotone"
-          dataKey="value"
-          stroke="#4ade80"
-          strokeWidth={3}
-          dot={{ r: 6, fill: "#22c55e" }}
-          activeDot={{ r: 10 }}
-        />
-      </LineChart>
-    </ResponsiveContainer>
-  </div>
-</div>
-
+        <div style={{ width: "100%", height: 350 }}>
+          <ResponsiveContainer>
+            <LineChart
+              data={[
+                { day: "Day 1", value: current * 0.92 },
+                { day: "Day 2", value: current * 0.95 },
+                { day: "Day 3", value: current * 1.01 },
+                { day: "Day 4", value: current * 1.03 },
+                { day: "Day 5", value: current * 1.08 },
+                { day: "Today", value: current },
+              ]}
+            >
+              <CartesianGrid strokeDasharray="3 3" stroke="#2a2e3f" />
+              <XAxis dataKey="day" stroke="#9aa0b5" />
+              <YAxis stroke="#9aa0b5" />
+              <Tooltip />
+              <Legend />
+              <Line
+                type="monotone"
+                dataKey="value"
+                stroke="#4ade80"
+                strokeWidth={3}
+                dot={{ r: 6, fill: "#22c55e" }}
+                activeDot={{ r: 10 }}
+              />
+            </LineChart>
+          </ResponsiveContainer>
+        </div>
+      </div>
     </div>
   );
 }
+
