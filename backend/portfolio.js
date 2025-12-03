@@ -1,48 +1,32 @@
-const { calculateStock } = require("./stock");
+function calculatePortfolio(stocks, totalAmount) {
+  const stockResults = [];
+  let totalCurrent = 0;
 
-function calculatePortfolio(stocks) {
-    let totalWeightage = 0;
+  stocks.forEach((s) => {
+    const investmentAmount = (s.weightage / 100) * totalAmount;
+    const sharesBought = investmentAmount / s.initialPrice;
+    const currentValue = sharesBought * s.currentPrice;
 
-stocks.forEach(s => totalWeightage += s.weightage);
+    const finalReturn = currentValue - investmentAmount;
 
-if (totalWeightage !== 100) {
-    throw new Error("Weightages must sum to 100%");
-}
-const roles = stocks.map(s => s.role);
+    totalCurrent += currentValue;
 
-if (roles.filter(r => r === "captain").length !== 1) {
-    throw new Error("one captain required");
-}
+    stockResults.push({
+      investmentAmount,
+      sharesBought,
+      currentValue,
+      finalReturn,
+      priceChangePercent:
+        ((s.currentPrice - s.initialPrice) / s.initialPrice) * 100,
+    });
+  });
 
-if (roles.filter(r => r === "vice").length !== 1) {
-    throw new Error("one vice-captain required");
-}
-stocks.forEach(s => {
-    if (s.initialPrice <= 0 || s.currentPrice <= 0) {
-        throw new Error("Prices must be positive");
-    }
-});
-
-
-const stockResults = stocks.map(s => calculateStock(s));
-
-let totalReturn = 0;
-
-stockResults.forEach(r => {
-    totalReturn += r.finalReturn;
-});
-
-
-const initialAmount = 100000;
-const totalValue = initialAmount + totalReturn;
-const portfolioReturnPercent = ((totalValue -initialAmount)/initialAmount)*100;
-
-return{
+  return {
+    totalInvested: totalAmount,
+    totalValue: totalCurrent,
+    netGrowth: totalCurrent - totalAmount,
     stockResults,
-    totalValue,
-    portfolioReturnPercent
-};
-
+  };
 }
 
 module.exports = { calculatePortfolio };
