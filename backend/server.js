@@ -47,14 +47,14 @@ const { rankingUsers } = require("./ranking");
 // --------------------
 app.post("/save-portfolio", async (req, res) => {
   try {
-    const { name, stocks } = req.body;
+    const { name, stocks, totalAmount } = req.body;
 
-    if (!name || !stocks)
-      return res.json({ error: "Name and stocks are required" });
+    if (!totalAmount || totalAmount <= 0) {
+      return res.json({ error: "Total investment amount is required" });
+    }
 
-    const result = calculatePortfolio(stocks);
+    const result = calculatePortfolio(stocks, totalAmount);
 
-    // save/update user
     await User.findOneAndUpdate(
       { name },
       { totalValue: result.totalValue },
@@ -67,6 +67,8 @@ app.post("/save-portfolio", async (req, res) => {
     res.json({ error: "Failed to save portfolio" });
   }
 });
+
+
 
 // --------------------
 // 5. GET REAL RANKINGS
@@ -103,41 +105,29 @@ const client = new OpenAI({
 
 app.post("/ai-suggest", async (req, res) => {
   try {
-    const { stocks } = req.body;
-
-    if (!stocks || stocks.length === 0) {
-      return res.status(400).json({ error: "No portfolio data received." });
-    }
+    const { stocks, totalAmount } = req.body;
 
     const prompt = `
-Analyze the following stock portfolio:
+User investment amount: ₹${totalAmount}
 
-${stocks.map(s => `${s.name} - Weight: ${s.weightage}%, Initial: ₹${s.initialPrice}, Current: ₹${s.currentPrice}`).join("\n")}
+User Portfolio:
+${JSON.stringify(stocks, null, 2)}
 
-Provide:
-1. Strengths of this portfolio
-2. Weaknesses
-3. Risk level
-4. Suggested improvements
-5. Recommended asset allocation (Equity %, Debt %, Gold %, Cash %)
+Give:
+- Risk analysis
+- Allocation suggestions
+- Improvements
+- Warning signs
+- Sector diversification
+- Final clear action plan
 `;
 
-    const response = await client.responses.create({
+    const completion = await client.chat.completions.create({
       model: "gpt-4o-mini",
-      input: [
-        {
-          role: "user",
-          content: prompt
-        }
-      ]
+      messages: [{ role: "user", content: prompt }],
     });
 
-    const suggestion =
-      response.output_text ||
-      response.output?.[0]?.content?.[0]?.text ||
-      "No suggestion available.";
-
-    res.json({ suggestion });
+    res.json({ suggestion: completion.choices[0].message.content });
 
   } catch (err) {
     console.error("AI ERROR:", err);

@@ -1,6 +1,14 @@
+// function calculatePortfolio(stocks, totalAmount) {
+//   const stockResults = [];
+//   let totalCurrent = 0;
+
+
 function calculatePortfolio(stocks, totalAmount) {
-  const stockResults = [];
-  let totalCurrent = 0;
+  if (!totalAmount || totalAmount <= 0) {
+    totalAmount = 100000; // fallback
+  }
+
+
 
   stocks.forEach((s) => {
     const investmentAmount = (s.weightage / 100) * totalAmount;
