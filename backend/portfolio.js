@@ -1,9 +1,15 @@
 function calculatePortfolio(stocks, totalAmount) {
-  if (!totalAmount || totalAmount <= 0) {
-    totalAmount = 100000; // fallback
+  // prevent dumb crashes
+  if (!Array.isArray(stocks) || stocks.length === 0) {
+    throw new Error("No stocks provided");
   }
 
+  if (!totalAmount || totalAmount <= 0) {
+    throw new Error("Invalid total investment amount");
+  }
 
+  let stockResults = [];
+  let totalCurrent = 0;
 
   stocks.forEach((s) => {
     const investmentAmount = (s.weightage / 100) * totalAmount;
@@ -31,5 +37,6 @@ function calculatePortfolio(stocks, totalAmount) {
     stockResults,
   };
 }
+
 
 module.exports = { calculatePortfolio };

@@ -5,6 +5,8 @@
 require("dotenv").config();
 
 
+
+
 const express = require("express");
 const cors = require("cors");
 const mongoose = require("mongoose");
@@ -14,7 +16,19 @@ console.log("OPENAI LOADED?", process.env.OPENAI_API_KEY ? "YES" : "NO");
 
 const app = express();
 app.use(express.json());
-app.use(cors());
+app.use(
+  cors({
+    origin: [
+      "http://localhost:5173",
+      "https://stockiemng.vercel.app",
+    ],
+    methods: ["GET", "POST"],
+    credentials: false
+  })
+);
+
+app.use(express.json({ limit: "2mb" }));
+app.use(express.urlencoded({ extended: true }));
 
 // --------------------
 // 1. CONNECT TO DB
@@ -48,6 +62,9 @@ const { rankingUsers } = require("./ranking");
 app.post("/save-portfolio", async (req, res) => {
   try {
     const { name, stocks, totalAmount } = req.body;
+
+        console.log("REQ BODY:", req.body);
+
 
     if (!totalAmount || totalAmount <= 0) {
       return res.json({ error: "Total investment amount is required" });
