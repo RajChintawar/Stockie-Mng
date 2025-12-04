@@ -6,8 +6,9 @@ export function PortfolioProvider({ children }) {
 
   // Load saved amount (important)
   const savedAmount = localStorage.getItem("totalAmount");
-  const [totalAmount, setTotalAmount] = useState(savedAmount ? Number(savedAmount) :0 );
-
+const [totalAmount, setTotalAmount] = useState(
+  Number(localStorage.getItem("totalAmount")) || 0
+);
   const [portfolioStocks, setPortfolioStocks] = useState(() => {
     const saved = localStorage.getItem("portfolioStocks");
     return saved ? JSON.parse(saved) : [];
@@ -20,7 +21,7 @@ export function PortfolioProvider({ children }) {
 
   // Save amount
   useEffect(() => {
-    localStorage.setItem("totalAmount", totalAmount);
+    localStorage.setItem("totalAmount", Number(totalAmount));
   }, [totalAmount]);
 
   // Save stocks

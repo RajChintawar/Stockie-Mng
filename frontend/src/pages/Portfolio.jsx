@@ -85,7 +85,7 @@ export default function Portfolio() {
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
         name: username,
-        totalAmount: totalAmount,
+        totalAmount: Number(totalAmount),
         stocks: portfolioStocks,
       }),
     })
