@@ -10,7 +10,7 @@ export default function Navbar() {
 
         {/* LOGO */}
         <Link to="/" className="text-2xl font-bold text-white">
-          My Mirror
+          Mirrafolio
         </Link>
 
         {/* DESKTOP MENU */}
