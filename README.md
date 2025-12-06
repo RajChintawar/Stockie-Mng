@@ -1,47 +1,67 @@
-## Stock Portfolio Management System ##
-A Node.js project that calculates portfolio performance based on stock weightages, prices, and multipliers, and ranks users by portfolio value.
+### Stockie-Mng — AI Powered Portfolio Manager
 
-** Features **
-Calculate per-stock metrics
-Captain (2x), Vice-Captain (1.5x), Regular (1x) multiplier system
-Portfolio validation rules
-Total portfolio value calculation
-User ranking system with tie support
-3 test scenarios included
+Stockie-Mng is a modern, full-stack stock portfolio management platform powered by AI suggestions, real-time analytics, leaderboards, and custom investment calculations.
 
-** Project Structure **
-index.js        → main entry point
-stock.js        → calculates one stock
-portfolio.js    → calculates complete portfolio
-ranking.js      → ranks multiple users
-test.js         → contains test scenarios
+Built using React, Node.js, MongoDB, and OpenAI, the project helps users create, analyze, and optimise their investment portfolios with ease.
 
-** How Calculations Work **
-1. Per Stock
+### Features
+1. Portfolio Builder (No Login Required)
+Users can:
+Add stocks with weightage, initial price, and current price
+Enter their custom investment amount
+Get real value calculations (not fixed to 100000)
+View profit/loss, shares bought, and returns
+Clear/reset portfolio anytime
 
-Investment = (100000 × weightage) / 100
-Shares = investment / initialPrice
-Current Value = shares × currentPrice
-Price Change % = ((currentPrice – initialPrice) / initialPrice) × 100
-Return = (currentValue – investment) × multiplier
+ 2. AI Portfolio Suggestions
+Using OpenAI, users get:
+Risk analysis
+Allocation improvement
+Sector diversification
+Weakness identification
+Final action plan
 
-2. Portfolio
+ 3. Dashboard & Visual Analytics
+Pie chart showing stock weightage
+Bar chart showing stock returns
+Line graph showing simulated growth
+Total portfolio value
+Return percentage
+Stock count
 
-TotalValue = 100000 + sum of all finalReturns
-Return % = ((TotalValue – 100000) / 100000) × 100
+ 4. Live Leaderboard
+Saves portfolio total value to the database
+Displays global ranking of all users
+Rank colors (🥇 🥈 🥉)
+Styled, responsive UI
 
-3. Ranking
+ 5. Future Scope (Planned)
+Login system (JWT / OAuth)
+Private dashboards
+Real stock market API integration
+User profile page
+Export reports
 
-Sorted by TotalValue (descending)
-Handles ties (same value → same rank)
+## Tech Stack
+## Frontend-
+React (Vite)
+Tailwind CSS
+Recharts
+React Router
 
-** Testing **
+## Backend
+Node.js
+Express
+MongoDB + Mongoose
+OpenAI API
+Deployment
 
-Run tests: node test.js
- Includes:
- -Single user
- -5+ users
- -Tie scenario
+Frontend: Vercel
+Backend: Render
+Database: MongoDB Atlas
 
-Running project : index.js
+
+## Live Links
+Frontend: https://stockie-mng.vercel.app
+Backend: https://stockie-mng-backend.onrender.com
  
