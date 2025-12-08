@@ -41,6 +41,19 @@ export default function Navbar() {
           <Link onClick={() => setOpen(false)} to="/suggestion" className="block">AI Advice</Link>
         </div>
       )}
+
+const { user, logout } = useContext(AuthContext);
+
+{user ? (
+  <button onClick={logout} className="text-red-400 font-bold">Logout</button>
+) : (
+  <a href="/login">Login</a>
+)}
+
+
+
+
+
     </nav>
   );
 }
