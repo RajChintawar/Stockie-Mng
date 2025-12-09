@@ -2,14 +2,31 @@ import { useEffect, useState } from "react";
 
 export default function Rankings() {
   const [rankings, setRankings] = useState([]);
+  const token = localStorage.getItem("token"); // 🟢 Get JWT
 
-  // 🟢 FETCH RANKINGS FROM BACKEND
+  // 🟢 FETCH RANKINGS (Protected route)
   useEffect(() => {
-    fetch("https://stockie-mng-backend.onrender.com/get-rankings")
+    if (!token) return;
+
+    fetch("https://stockie-mng-backend.onrender.com/get-rankings", {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${token}`, // 🟢 IMPORTANT FIX
+      },
+    })
       .then((res) => res.json())
       .then((data) => setRankings(data))
       .catch((err) => console.error("Rankings fetch error:", err));
-  }, []);
+  }, [token]);
+
+  if (!token) {
+    return (
+      <h2 className="text-white p-6 text-center text-xl">
+        Login first dumbass 😭🔥
+      </h2>
+    );
+  }
 
   if (!rankings.length) {
     return (
@@ -19,7 +36,7 @@ export default function Rankings() {
     );
   }
 
-  // 🧠 SORT + ADD RANK NUMBER
+  // 🧠 SORT + ADD RANK
   const sorted = [...rankings]
     .sort((a, b) => b.totalValue - a.totalValue)
     .map((u, i) => ({
@@ -54,9 +71,9 @@ export default function Rankings() {
     }
   };
 
-  // ⭐ NEW: Clear Data Button
+  // Clear local (frontend) rankings
   const clearLocalRankings = () => {
-    setRankings([]); // clears frontend only
+    setRankings([]);
   };
 
   return (
@@ -102,7 +119,6 @@ export default function Rankings() {
           </tbody>
         </table>
 
-        {/* ⭐ CLEAR BUTTON */}
         <div className="mt-6 text-center">
           <button
             onClick={clearLocalRankings}

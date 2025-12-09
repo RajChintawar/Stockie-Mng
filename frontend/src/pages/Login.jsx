@@ -13,50 +13,54 @@ export default function Login() {
     setForm({ ...form, [e.target.name]: e.target.value });
   };
 
-  const submit = () => {
-    fetch("https://stockie-mng-backend.onrender.com/login", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(form),
-    })
-      .then((res) => res.json())
-      .then((data) => {
-        if (!data.success) {
-          setError(data.error || "Login failed 😭🔥");
-        } else {
-          login(data);
-          navigate("/dashboard");
-        }
-      });
+  const handleLogin = async () => {
+    setError("");
+
+    const res = await fetch(
+      "https://stockie-mng-backend.onrender.com/auth/login",
+      {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(form),
+      }
+    );
+
+    const data = await res.json();
+
+    if (data.error) {
+      setError(data.error);
+      return;
+    }
+
+    login(data); // Save token + user globally
+
+    navigate("/dashboard");
   };
 
   return (
-    <div className="p-8 max-w-lg mx-auto text-white space-y-6">
-      <h2 className="text-3xl font-bold">Login</h2>
+    <div className="p-6 text-white max-w-md mx-auto">
+      <h2 className="text-3xl font-bold mb-4">Login</h2>
 
-      {error && <p className="text-red-400">{error}</p>}
+      {error && <p className="text-red-400 mb-2">{error}</p>}
 
       <input
         name="email"
-        type="email"
-        placeholder="Email"
-        value={form.email}
         onChange={handleChange}
-        className="p-3 rounded-xl bg-[#1b1f27] w-full"
+        placeholder="Email"
+        className="w-full p-3 mb-3 bg-[#1b1f27] rounded"
       />
 
       <input
         name="password"
         type="password"
-        placeholder="Password"
-        value={form.password}
         onChange={handleChange}
-        className="p-3 rounded-xl bg-[#1b1f27] w-full"
+        placeholder="Password"
+        className="w-full p-3 mb-3 bg-[#1b1f27] rounded"
       />
 
       <button
-        onClick={submit}
-        className="bg-blue-600 px-6 py-2 rounded-xl w-full"
+        onClick={handleLogin}
+        className="w-full bg-blue-600 p-3 rounded-xl mt-2"
       >
         Login
       </button>

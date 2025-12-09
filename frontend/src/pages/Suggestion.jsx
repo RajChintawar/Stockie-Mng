@@ -1,12 +1,19 @@
 import { useState, useContext } from "react";
 import { PortfolioContext } from "../context/PortfolioContext";
+import { AuthContext } from "../context/AuthContext"; // 🔥 REQUIRED FOR TOKEN
 
 export default function Suggestion() {
-const { portfolioStocks, totalAmount } = useContext(PortfolioContext);
+  const { portfolioStocks, totalAmount } = useContext(PortfolioContext);
+  const { token } = useContext(AuthContext); // 🔥 GET TOKEN FROM AUTH
   const [suggestion, setSuggestion] = useState(null);
   const [loading, setLoading] = useState(false);
 
   const getSuggestion = () => {
+    if (!token) {
+      alert("Login first dumbass 😭🔥");
+      return;
+    }
+
     if (portfolioStocks.length === 0) {
       alert("Add some stocks first you goblin 😭🔥");
       return;
@@ -16,8 +23,14 @@ const { portfolioStocks, totalAmount } = useContext(PortfolioContext);
 
     fetch("https://stockie-mng-backend.onrender.com/ai-suggest", {
       method: "POST",
-      headers: { "Content-Type": "application/json" },
-body: JSON.stringify({ stocks: portfolioStocks, totalAmount }),
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${token}`, // 🔥 FIXED TOKEN
+      },
+      body: JSON.stringify({
+        stocks: portfolioStocks,
+        totalAmount,
+      }),
     })
       .then((res) => res.json())
       .then((data) => setSuggestion(data.suggestion))
@@ -45,7 +58,7 @@ body: JSON.stringify({ stocks: portfolioStocks, totalAmount }),
         </button>
       </div>
 
-      {/* Loading state */}
+      {/* Loading */}
       {loading && (
         <div className="mt-6 flex flex-col items-center gap-4">
           <div className="w-10 h-10 border-4 border-blue-500 border-t-transparent 

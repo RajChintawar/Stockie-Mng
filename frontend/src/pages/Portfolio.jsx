@@ -1,9 +1,12 @@
 import { useState, useContext } from "react";
 import { PortfolioContext } from "../context/PortfolioContext";
 import { useNavigate } from "react-router-dom";
+import { AuthContext } from "../context/AuthContext";
+
 
 export default function Portfolio() {
   const navigate = useNavigate();
+
 
   // FIX: useContext in **one place only**
   const {
@@ -14,6 +17,7 @@ export default function Portfolio() {
     totalAmount,
     setTotalAmount
   } = useContext(PortfolioContext);
+  const { token } = useContext(AuthContext);
 
   const [error, setError] = useState("");
   const [username, setUsername] = useState("");
@@ -82,7 +86,9 @@ export default function Portfolio() {
 
     fetch("https://stockie-mng-backend.onrender.com/save-portfolio", {
       method: "POST",
-      headers: { "Content-Type": "application/json" },
+      headers: { "Content-Type": "application/json",
+        Authorization: `Bearer ${token}`,
+       },
       body: JSON.stringify({
         name: username,
         totalAmount: Number(totalAmount),

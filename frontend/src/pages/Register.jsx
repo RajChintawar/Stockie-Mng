@@ -1,7 +1,9 @@
-import { useState } from "react";
+import { useState, useContext } from "react";
+import { AuthContext } from "../context/AuthContext";
 import { useNavigate } from "react-router-dom";
 
 export default function Register() {
+  const { login } = useContext(AuthContext);
   const navigate = useNavigate();
 
   const [form, setForm] = useState({
@@ -10,61 +12,57 @@ export default function Register() {
     password: "",
   });
 
-  const [error, setError] = useState("");
-
-  const handleChange = (e) => {
+  const handleChange = (e) =>
     setForm({ ...form, [e.target.name]: e.target.value });
-  };
 
-  const submit = () => {
-    fetch("https://stockie-mng-backend.onrender.com/register", {
+  const registerUser = async () => {
+    const res = await fetch("https://stockie-mng-backend.onrender.com/auth/register", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(form),
-    })
-      .then((res) => res.json())
-      .then((data) => {
-        if (!data.success) setError(data.error);
-        else navigate("/login");
-      });
+    });
+
+    const data = await res.json();
+
+    if (data.error) return alert(data.error);
+
+    alert("Account created! Now login 🔥");
+    navigate("/login");
   };
 
   return (
-    <div className="p-8 max-w-lg mx-auto text-white space-y-6">
-      <h2 className="text-3xl font-bold">Register</h2>
-
-      {error && <p className="text-red-400">{error}</p>}
+    <div className="p-6 max-w-md mx-auto text-white">
+      <h2 className="text-3xl font-bold mb-4">Register</h2>
 
       <input
+        type="text"
         name="name"
         placeholder="Name"
-        value={form.name}
+        className="p-3 w-full bg-[#1b1f27] rounded-xl mb-3"
         onChange={handleChange}
-        className="p-3 rounded-xl bg-[#1b1f27] w-full"
       />
 
       <input
+        type="email"
         name="email"
         placeholder="Email"
-        value={form.email}
+        className="p-3 w-full bg-[#1b1f27] rounded-xl mb-3"
         onChange={handleChange}
-        className="p-3 rounded-xl bg-[#1b1f27] w-full"
       />
 
       <input
-        name="password"
         type="password"
+        name="password"
         placeholder="Password"
-        value={form.password}
+        className="p-3 w-full bg-[#1b1f27] rounded-xl mb-3"
         onChange={handleChange}
-        className="p-3 rounded-xl bg-[#1b1f27] w-full"
       />
 
       <button
-        onClick={submit}
-        className="bg-green-600 px-6 py-2 rounded-xl w-full"
+        onClick={registerUser}
+        className="bg-blue-600 px-5 py-2 rounded-xl"
       >
-        Register
+        Create Account
       </button>
     </div>
   );
