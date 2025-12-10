@@ -44,10 +44,10 @@ Export reports
 
 ## Tech Stack
 ## Frontend-
-React (Vite)
-Tailwind CSS
-Recharts
-React Router
+![React](https://img.shields.io/badge/React-20232A?style=for-the-badge&logo=react&logoColor=61DAFB)
+![Vite](https://img.shields.io/badge/Vite-646CFF?style=for-the-badge&logo=vite&logoColor=FFD62E)
+![Recharts](https://img.shields.io/badge/Recharts-FF6384?style=for-the-badge&logo=recharts&logoColor=white)
+
 
 ## Backend
 ![React](https://img.shields.io/badge/React-20232A?style=for-the-badge&logo=react&logoColor=61DAFB)
@@ -55,15 +55,18 @@ React Router
 ![Express](https://img.shields.io/badge/Express.js-000000?style=for-the-badge&logo=express&logoColor=white)
 ![MongoDB](https://img.shields.io/badge/MongoDB-4EA94B?style=for-the-badge&logo=mongodb&logoColor=white)
 ![Vite](https://img.shields.io/badge/Vite-B73BFE?style=for-the-badge&logo=vite&logoColor=FFD62E)
-![OpenAI](https://img.shields.io/badge/Vite-B73BFE?style=for-the-badge&logo=vite&logoColor=FFD62E)
+![OpenAI](https://img.shields.io/badge/OpenAI-B73BFE?style=for-the-badge&logo=vite&logoColor=FFD62E)
 
 Deployment
 
-Frontend: Vercel
-Backend: Render
+Frontend:![Vercel](https://img.shields.io/badge/Vercel-000000?style=for-the-badge&logo=vercel&logoColor=white)
+
+ 
+Backend: ![Render](https://img.shields.io/badge/Render-46E3B7?style=for-the-badge)
 
 
-Database: 
+
+## Database: 
 ![MongoDBAtlas](https://img.shields.io/badge/MongoDB-4EA94B?style=for-the-badge&logo=mongodb&logoColor=white)
 
 
