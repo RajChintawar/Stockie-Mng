@@ -26,3 +26,7 @@ dist-ssr
 node_modules/
 .env
 .env.local
+
+
+git-filter-repo
+git-filter-repo*
