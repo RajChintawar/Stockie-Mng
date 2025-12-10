@@ -55,7 +55,6 @@ Export reports
 ![Express](https://img.shields.io/badge/Express.js-000000?style=for-the-badge&logo=express&logoColor=white)
 ![MongoDB](https://img.shields.io/badge/MongoDB-4EA94B?style=for-the-badge&logo=mongodb&logoColor=white)
 ![Vite](https://img.shields.io/badge/Vite-B73BFE?style=for-the-badge&logo=vite&logoColor=FFD62E)
-![OpenAI](https://img.shields.io/badge/OpenAI-B73BFE?style=for-the-badge&logo=vite&logoColor=FFD62E)
 
 Deployment
 
