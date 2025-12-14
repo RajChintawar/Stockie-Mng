@@ -20,6 +20,18 @@ app.use(
   })
 );
 
+
+app.get("/test", (req, res) => {
+  res.json({ ok: true, message: "API working" });
+});
+
+
+
+
+
+
+
+
 // ----------------------------------------------------------------
 // 1️⃣ MAIN DB — For Portfolio & Rankings
 // ----------------------------------------------------------------
@@ -187,6 +199,21 @@ app.post("/auth/login", async (req, res) => {
 app.get("/", (req, res) => {
   res.send("Backend is LIVE 🚀");
 });
+
+
+const indianStocks = require("./data/indianStocks");
+
+app.get("/stocks/top", (req, res) => {
+  res.json(indianStocks);
+});
+
+
+
+
+
+
+
+
 
 app.listen(3000, () => console.log("Server running on 3000 ✔"));
 

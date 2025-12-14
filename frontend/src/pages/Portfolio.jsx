@@ -1,28 +1,25 @@
-import { useState, useContext } from "react";
+import { useState, useContext, useEffect } from "react";
 import { PortfolioContext } from "../context/PortfolioContext";
-import { useNavigate } from "react-router-dom";
 import { AuthContext } from "../context/AuthContext";
 
-
 export default function Portfolio() {
-  const navigate = useNavigate();
-
-
-  // FIX: useContext in **one place only**
   const {
     portfolioResult,
     setPortfolioResult,
     portfolioStocks,
     setPortfolioStocks,
     totalAmount,
-    setTotalAmount
+    setTotalAmount,
   } = useContext(PortfolioContext);
+
   const { token } = useContext(AuthContext);
 
+  const [availableStocks, setAvailableStocks] = useState([]);
   const [error, setError] = useState("");
   const [username, setUsername] = useState("");
 
   const [form, setForm] = useState({
+    symbol: "",
     name: "",
     weightage: "",
     initialPrice: "",
@@ -30,17 +27,31 @@ export default function Portfolio() {
     role: "regular",
   });
 
+  // 🔥 FETCH TOP 50 INDIAN STOCKS
+  useEffect(() => {
+    fetch("https://stockie-mng-backend.onrender.com/stocks/top")
+      .then((res) => res.json())
+      .then((data) => setAvailableStocks(data))
+      .catch(() => setError("Failed to load stock list 💀"));
+  }, []);
+
   const handleChange = (e) => {
     setForm({ ...form, [e.target.name]: e.target.value });
   };
 
   const addStock = () => {
-    if (!form.name || !form.weightage || !form.initialPrice || !form.currentPrice) {
+    if (
+      !form.symbol ||
+      !form.weightage ||
+      !form.initialPrice ||
+      !form.currentPrice
+    ) {
       setError("Fill all fields dumbass 😭🔥");
       return;
     }
 
     const newStock = {
+      symbol: form.symbol,
       name: form.name,
       weightage: Number(form.weightage),
       initialPrice: Number(form.initialPrice),
@@ -52,6 +63,7 @@ export default function Portfolio() {
     setError("");
 
     setForm({
+      symbol: "",
       name: "",
       weightage: "",
       initialPrice: "",
@@ -86,9 +98,10 @@ export default function Portfolio() {
 
     fetch("https://stockie-mng-backend.onrender.com/save-portfolio", {
       method: "POST",
-      headers: { "Content-Type": "application/json",
-        Authorization: `Bearer ${token}`,
-       },
+      headers: {
+        "Content-Type": "application/json",
+        ...(token && { Authorization: `Bearer ${token}` }),
+      },
       body: JSON.stringify({
         name: username,
         totalAmount: Number(totalAmount),
@@ -108,7 +121,7 @@ export default function Portfolio() {
     setPortfolioResult(null);
     setError("");
     setUsername("");
-    setTotalAmount(0); // FIX: reset to number not string
+    setTotalAmount(0);
 
     localStorage.removeItem("portfolioStocks");
     localStorage.removeItem("portfolioResult");
@@ -117,19 +130,16 @@ export default function Portfolio() {
 
   return (
     <div className="p-8 max-w-6xl mx-auto text-white space-y-10">
-      <h2 className="text-4xl font-bold tracking-tight mb-6">Portfolio</h2>
+      <h2 className="text-4xl font-bold tracking-tight">Portfolio</h2>
 
-      {/* ERROR BOX */}
       {error && (
-        <div className="bg-red-700/60 border border-red-500/40 p-4 rounded-xl backdrop-blur-md shadow-lg">
-          <p className="text-white font-semibold">{error}</p>
+        <div className="bg-red-700/60 p-4 rounded-xl">
+          <p className="font-semibold">{error}</p>
         </div>
       )}
 
-      {/* FORM CARD */}
-      <div className="p-6 rounded-2xl bg-[#151821]/70 backdrop-blur-xl border border-white/10 shadow-xl space-y-5">
+      <div className="p-6 rounded-2xl bg-[#151821]/70 border border-white/10 space-y-5">
 
-        {/* Username */}
         <input
           value={username}
           onChange={(e) => setUsername(e.target.value)}
@@ -137,32 +147,45 @@ export default function Portfolio() {
           className="p-3 rounded-xl bg-[#1b1f27] border border-white/10 w-full"
         />
 
-        {/* Total Amount */}
         <input
           value={totalAmount}
           onChange={(e) => setTotalAmount(Number(e.target.value))}
-          placeholder="Enter Total Amount to be Invested (₹)"
+          placeholder="Total Investment Amount (₹)"
           className="p-3 rounded-xl bg-[#1b1f27] border border-white/10 w-full"
-          inputMode="numeric"
         />
 
-        <h3 className="text-2xl font-semibold mb-4">Add Stock</h3>
+        <h3 className="text-2xl font-semibold">Add Stock</h3>
 
         <div className="grid grid-cols-1 md:grid-cols-5 gap-4">
-          <input
-            name="name"
-            value={form.name}
-            onChange={handleChange}
-            placeholder="Stock Name"
+
+          {/* 🔥 STOCK DROPDOWN */}
+          <select
+            value={form.symbol}
+            onChange={(e) => {
+              const selected = availableStocks.find(
+                (s) => s.symbol === e.target.value
+              );
+              setForm({
+                ...form,
+                symbol: selected?.symbol || "",
+                name: selected?.name || "",
+              });
+            }}
             className="p-3 rounded-xl bg-[#1b1f27] border border-white/10"
-          />
+          >
+            <option value="">Select Stock</option>
+            {availableStocks.map((stock) => (
+              <option key={stock.symbol} value={stock.symbol}>
+                {stock.name} ({stock.symbol})
+              </option>
+            ))}
+          </select>
 
           <input
             name="weightage"
             value={form.weightage}
             onChange={handleChange}
             placeholder="Weight %"
-            inputMode="numeric"
             className="p-3 rounded-xl bg-[#1b1f27] border border-white/10"
           />
 
@@ -171,7 +194,6 @@ export default function Portfolio() {
             value={form.initialPrice}
             onChange={handleChange}
             placeholder="Initial Price"
-            inputMode="numeric"
             className="p-3 rounded-xl bg-[#1b1f27] border border-white/10"
           />
 
@@ -180,7 +202,6 @@ export default function Portfolio() {
             value={form.currentPrice}
             onChange={handleChange}
             placeholder="Current Price"
-            inputMode="numeric"
             className="p-3 rounded-xl bg-[#1b1f27] border border-white/10"
           />
 
@@ -198,63 +219,61 @@ export default function Portfolio() {
 
         <button
           onClick={addStock}
-          className="mt-3 bg-blue-600 px-5 py-2 rounded-xl font-semibold hover:bg-blue-700 transition shadow-lg"
+          className="bg-blue-600 px-6 py-2 rounded-xl font-semibold hover:bg-blue-700"
         >
           Add Stock
         </button>
       </div>
 
-      {/* ADDED STOCKS TABLE */}
       {portfolioStocks.length > 0 && (
-        <div className="p-6 rounded-2xl bg-[#151821]/70 backdrop-blur-xl border border-white/10 shadow-xl overflow-x-auto">
+        <div className="p-6 rounded-2xl bg-[#151821]/70 border border-white/10">
           <h3 className="text-2xl font-semibold mb-4">Added Stocks</h3>
 
-          <div className="overflow-x-auto">
-            <table className="min-w-[900px] w-full border-collapse table-auto">
-              <thead className="text-gray-300 bg-white/5">
-                <tr>
-                  <th className="p-3 text-left">Remove</th>
-                  <th className="p-3 text-left">Name</th>
-                  <th className="p-3 text-left">Weight %</th>
-                  <th className="p-3 text-left">Initial</th>
-                  <th className="p-3 text-left">Current</th>
-                  <th className="p-3 text-left">Role</th>
+          <table className="w-full">
+            <thead className="text-gray-300">
+              <tr>
+                <th>Remove</th>
+                <th>Stock</th>
+                <th>Weight</th>
+                <th>Initial</th>
+                <th>Current</th>
+                <th>Role</th>
+              </tr>
+            </thead>
+            <tbody>
+              {portfolioStocks.map((s, idx) => (
+                <tr key={idx} className="border-t border-gray-700">
+                  <td>
+                    <button
+                      onClick={() => removeStock(idx)}
+                      className="text-red-400"
+                    >
+                      Remove
+                    </button>
+                  </td>
+                  <td>
+                    {s.name} <span className="text-gray-400">({s.symbol})</span>
+                  </td>
+                  <td>{s.weightage}%</td>
+                  <td>₹{s.initialPrice}</td>
+                  <td>₹{s.currentPrice}</td>
+                  <td>{s.role}</td>
                 </tr>
-              </thead>
-
-              <tbody>
-                {portfolioStocks.map((s, idx) => (
-                  <tr key={idx} className="border-b border-gray-800">
-                    <td className="p-3">
-                      <button
-                        onClick={() => removeStock(idx)}
-                        className="text-red-400 border border-red-500 px-3 py-1 rounded-lg hover:bg-red-600 hover:text-white transition"
-                      >
-                        Remove
-                      </button>
-                    </td>
-                    <td className="p-3">{s.name}</td>
-                    <td className="p-3">{s.weightage}%</td>
-                    <td className="p-3">₹{s.initialPrice}</td>
-                    <td className="p-3">₹{s.currentPrice}</td>
-                    <td className="p-3">{s.role}</td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
+              ))}
+            </tbody>
+          </table>
 
           <div className="flex gap-4 mt-6">
             <button
               onClick={calculatePortfolio}
-              className="bg-green-600 px-6 py-2 rounded-xl font-semibold hover:bg-green-700 transition shadow-lg"
+              className="bg-green-600 px-6 py-2 rounded-xl font-semibold"
             >
               Calculate Portfolio
             </button>
 
             <button
               onClick={clearAll}
-              className="bg-red-600 px-6 py-2 rounded-xl font-semibold hover:bg-red-700 transition shadow-lg"
+              className="bg-red-600 px-6 py-2 rounded-xl font-semibold"
             >
               Clear Data
             </button>
@@ -262,41 +281,40 @@ export default function Portfolio() {
         </div>
       )}
 
-      {/* RESULT TABLE */}
       {portfolioResult && (
-        <div className="p-6 mt-10 rounded-2xl bg-[#151821]/70 backdrop-blur-xl border border-white/10 shadow-xl overflow-x-auto">
-          <h3 className="text-2xl font-semibold mb-4">Detailed Stock Breakdown</h3>
+        <div className="p-6 rounded-2xl bg-[#151821]/70 border border-white/10">
+          <h3 className="text-2xl font-semibold mb-4">
+            Detailed Stock Breakdown
+          </h3>
 
-          <div className="overflow-x-auto">
-            <table className="min-w-[900px] w-full border-collapse table-auto">
-              <thead className="text-gray-300 bg-white/5">
-                <tr>
-                  <th className="p-3 text-left">Stock</th>
-                  <th className="p-3 text-left">Investment</th>
-                  <th className="p-3 text-left">Shares</th>
-                  <th className="p-3 text-left">Current Value</th>
-                  <th className="p-3 text-left">Price Change</th>
-                  <th className="p-3 text-left">Final Return</th>
+          <table className="w-full">
+            <thead className="text-gray-300">
+              <tr>
+                <th>Stock</th>
+                <th>Investment</th>
+                <th>Shares</th>
+                <th>Current Value</th>
+                <th>Change</th>
+                <th>Return</th>
+              </tr>
+            </thead>
+            <tbody>
+              {portfolioResult.stockResults.map((s, i) => (
+                <tr key={i} className="border-t border-gray-700">
+                  <td>{portfolioStocks[i]?.name}</td>
+                  <td>₹{s.investmentAmount.toFixed(2)}</td>
+                  <td>{s.sharesBought.toFixed(2)}</td>
+                  <td>₹{s.currentValue.toFixed(2)}</td>
+                  <td>{s.priceChangePercent.toFixed(2)}%</td>
+                  <td className="text-green-400">
+                    ₹{s.finalReturn.toFixed(2)}
+                  </td>
                 </tr>
-              </thead>
-
-              <tbody>
-                {portfolioResult.stockResults.map((s, i) => (
-                  <tr key={i} className="border-b border-gray-800">
-                    <td className="p-3">{portfolioStocks[i]?.name}</td>
-                    <td className="p-3">₹{s.investmentAmount.toFixed(2)}</td>
-                    <td className="p-3">{s.sharesBought.toFixed(2)}</td>
-                    <td className="p-3">₹{s.currentValue.toFixed(2)}</td>
-                    <td className="p-3">{s.priceChangePercent.toFixed(2)}%</td>
-                    <td className="p-3 text-green-400">₹{s.finalReturn.toFixed(2)}</td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
+              ))}
+            </tbody>
+          </table>
         </div>
       )}
-
     </div>
   );
 }
