@@ -247,7 +247,7 @@ localStorage.removeItem("pf_username");
       )}
 
       {/* ================= RESULT ================= */}
-      {result && (
+{result && (
         <div className="p-6 bg-[#151821]/70 rounded-2xl border border-white/10">
           <h3 className="text-2xl font-semibold mb-4">Calculated Portfolio</h3>
 
