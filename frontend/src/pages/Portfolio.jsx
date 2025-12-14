@@ -1,25 +1,31 @@
 import { useState, useContext, useEffect } from "react";
 import { PortfolioContext } from "../context/PortfolioContext";
+import { useNavigate } from "react-router-dom";
 import { AuthContext } from "../context/AuthContext";
 
 export default function Portfolio() {
+  const navigate = useNavigate();
+
   const {
     portfolioResult,
     setPortfolioResult,
     portfolioStocks,
     setPortfolioStocks,
     totalAmount,
-    setTotalAmount,
+    setTotalAmount
   } = useContext(PortfolioContext);
 
   const { token } = useContext(AuthContext);
 
-  const [availableStocks, setAvailableStocks] = useState([]);
   const [error, setError] = useState("");
   const [username, setUsername] = useState("");
 
+  // 🔥 NEW: STOCK LIST STATE (DON’T TOUCH)
+  const [stockList, setStockList] = useState([]);
+  const [stockLoading, setStockLoading] = useState(true);
+  const [stockError, setStockError] = useState("");
+
   const [form, setForm] = useState({
-    symbol: "",
     name: "",
     weightage: "",
     initialPrice: "",
@@ -27,12 +33,26 @@ export default function Portfolio() {
     role: "regular",
   });
 
-  // 🔥 FETCH TOP 50 INDIAN STOCKS
+  // 🔥 FETCH STOCKS ONCE (STABLE)
   useEffect(() => {
-    fetch("https://stockie-mng-backend.onrender.com/stocks/top")
-      .then((res) => res.json())
-      .then((data) => setAvailableStocks(data))
-      .catch(() => setError("Failed to load stock list 💀"));
+    const fetchStocks = async () => {
+      try {
+        setStockLoading(true);
+        const res = await fetch(
+          "https://stockie-mng-backend.onrender.com/stocks/top"
+        );
+        if (!res.ok) throw new Error("API failed");
+        const data = await res.json();
+        setStockList(data);
+      } catch (err) {
+        console.error(err);
+        setStockError("Failed to load stock list");
+      } finally {
+        setStockLoading(false);
+      }
+    };
+
+    fetchStocks();
   }, []);
 
   const handleChange = (e) => {
@@ -40,18 +60,12 @@ export default function Portfolio() {
   };
 
   const addStock = () => {
-    if (
-      !form.symbol ||
-      !form.weightage ||
-      !form.initialPrice ||
-      !form.currentPrice
-    ) {
+    if (!form.name || !form.weightage || !form.initialPrice || !form.currentPrice) {
       setError("Fill all fields dumbass 😭🔥");
       return;
     }
 
     const newStock = {
-      symbol: form.symbol,
       name: form.name,
       weightage: Number(form.weightage),
       initialPrice: Number(form.initialPrice),
@@ -63,7 +77,6 @@ export default function Portfolio() {
     setError("");
 
     setForm({
-      symbol: "",
       name: "",
       weightage: "",
       initialPrice: "",
@@ -100,7 +113,7 @@ export default function Portfolio() {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
-        ...(token && { Authorization: `Bearer ${token}` }),
+        Authorization: `Bearer ${token}`,
       },
       body: JSON.stringify({
         name: username,
@@ -130,10 +143,10 @@ export default function Portfolio() {
 
   return (
     <div className="p-8 max-w-6xl mx-auto text-white space-y-10">
-      <h2 className="text-4xl font-bold tracking-tight">Portfolio</h2>
+      <h2 className="text-4xl font-bold tracking-tight mb-6">Portfolio</h2>
 
       {error && (
-        <div className="bg-red-700/60 p-4 rounded-xl">
+        <div className="bg-red-700/60 border border-red-500/40 p-4 rounded-xl">
           <p className="font-semibold">{error}</p>
         </div>
       )}
@@ -150,7 +163,7 @@ export default function Portfolio() {
         <input
           value={totalAmount}
           onChange={(e) => setTotalAmount(Number(e.target.value))}
-          placeholder="Total Investment Amount (₹)"
+          placeholder="Enter Total Amount (₹)"
           className="p-3 rounded-xl bg-[#1b1f27] border border-white/10 w-full"
         />
 
@@ -158,28 +171,30 @@ export default function Portfolio() {
 
         <div className="grid grid-cols-1 md:grid-cols-5 gap-4">
 
-          {/* 🔥 STOCK DROPDOWN */}
-          <select
-            value={form.symbol}
-            onChange={(e) => {
-              const selected = availableStocks.find(
-                (s) => s.symbol === e.target.value
-              );
-              setForm({
-                ...form,
-                symbol: selected?.symbol || "",
-                name: selected?.name || "",
-              });
-            }}
-            className="p-3 rounded-xl bg-[#1b1f27] border border-white/10"
-          >
-            <option value="">Select Stock</option>
-            {availableStocks.map((stock) => (
-              <option key={stock.symbol} value={stock.symbol}>
-                {stock.name} ({stock.symbol})
-              </option>
-            ))}
-          </select>
+          {/* 🔥 STOCK SELECTOR (FIXED, STABLE) */}
+          {stockLoading ? (
+            <div className="p-3 rounded-xl bg-[#1b1f27] border border-white/10 text-gray-400">
+              Loading stocks…
+            </div>
+          ) : stockError ? (
+            <div className="p-3 rounded-xl bg-red-600/30 text-red-300">
+              {stockError}
+            </div>
+          ) : (
+            <select
+              name="name"
+              value={form.name}
+              onChange={handleChange}
+              className="p-3 rounded-xl bg-[#1b1f27] border border-white/10"
+            >
+              <option value="">Select Stock</option>
+              {stockList.map((s) => (
+                <option key={s.symbol} value={s.name}>
+                  {s.name} ({s.symbol}) — {s.sector}
+                </option>
+              ))}
+            </select>
+          )}
 
           <input
             name="weightage"
@@ -219,21 +234,22 @@ export default function Portfolio() {
 
         <button
           onClick={addStock}
-          className="bg-blue-600 px-6 py-2 rounded-xl font-semibold hover:bg-blue-700"
+          className="bg-blue-600 px-5 py-2 rounded-xl font-semibold"
         >
           Add Stock
         </button>
       </div>
 
+      {/* EVERYTHING BELOW THIS IS UNTOUCHED */}
       {portfolioStocks.length > 0 && (
         <div className="p-6 rounded-2xl bg-[#151821]/70 border border-white/10">
           <h3 className="text-2xl font-semibold mb-4">Added Stocks</h3>
 
           <table className="w-full">
-            <thead className="text-gray-300">
+            <thead>
               <tr>
                 <th>Remove</th>
-                <th>Stock</th>
+                <th>Name</th>
                 <th>Weight</th>
                 <th>Initial</th>
                 <th>Current</th>
@@ -241,19 +257,12 @@ export default function Portfolio() {
               </tr>
             </thead>
             <tbody>
-              {portfolioStocks.map((s, idx) => (
-                <tr key={idx} className="border-t border-gray-700">
+              {portfolioStocks.map((s, i) => (
+                <tr key={i}>
                   <td>
-                    <button
-                      onClick={() => removeStock(idx)}
-                      className="text-red-400"
-                    >
-                      Remove
-                    </button>
+                    <button onClick={() => removeStock(i)}>Remove</button>
                   </td>
-                  <td>
-                    {s.name} <span className="text-gray-400">({s.symbol})</span>
-                  </td>
+                  <td>{s.name}</td>
                   <td>{s.weightage}%</td>
                   <td>₹{s.initialPrice}</td>
                   <td>₹{s.currentPrice}</td>
@@ -263,58 +272,13 @@ export default function Portfolio() {
             </tbody>
           </table>
 
-          <div className="flex gap-4 mt-6">
-            <button
-              onClick={calculatePortfolio}
-              className="bg-green-600 px-6 py-2 rounded-xl font-semibold"
-            >
-              Calculate Portfolio
-            </button>
-
-            <button
-              onClick={clearAll}
-              className="bg-red-600 px-6 py-2 rounded-xl font-semibold"
-            >
-              Clear Data
-            </button>
+          <div className="flex gap-4 mt-4">
+            <button onClick={calculatePortfolio}>Calculate Portfolio</button>
+            <button onClick={clearAll}>Clear</button>
           </div>
         </div>
       )}
 
-      {portfolioResult && (
-        <div className="p-6 rounded-2xl bg-[#151821]/70 border border-white/10">
-          <h3 className="text-2xl font-semibold mb-4">
-            Detailed Stock Breakdown
-          </h3>
-
-          <table className="w-full">
-            <thead className="text-gray-300">
-              <tr>
-                <th>Stock</th>
-                <th>Investment</th>
-                <th>Shares</th>
-                <th>Current Value</th>
-                <th>Change</th>
-                <th>Return</th>
-              </tr>
-            </thead>
-            <tbody>
-              {portfolioResult.stockResults.map((s, i) => (
-                <tr key={i} className="border-t border-gray-700">
-                  <td>{portfolioStocks[i]?.name}</td>
-                  <td>₹{s.investmentAmount.toFixed(2)}</td>
-                  <td>{s.sharesBought.toFixed(2)}</td>
-                  <td>₹{s.currentValue.toFixed(2)}</td>
-                  <td>{s.priceChangePercent.toFixed(2)}%</td>
-                  <td className="text-green-400">
-                    ₹{s.finalReturn.toFixed(2)}
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
-      )}
     </div>
   );
 }

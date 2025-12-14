@@ -9,6 +9,10 @@ const indianStocks = [
   { symbol: "LT", name: "Larsen & Toubro", sector: "Infrastructure" },
   { symbol: "AXISBANK", name: "Axis Bank", sector: "Banking" },
   { symbol: "BHARTIARTL", name: "Bharti Airtel", sector: "Telecom" },
+    { symbol: "NIKE", name: "Nike", sector: "Fashion" },
+  { symbol: "ZARA", name: "Zara", sector: "Fashion" },
+  { symbol: "H&M", name: "H & M", sector: "Fashion" },
+
   // we’ll complete all 50 later, relax
 ];
 
