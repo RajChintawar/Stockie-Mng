@@ -1,4 +1,5 @@
 import Navbar from "./components/Navbar";
+import Footer from "./components/footer";
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 
 import Dashboard from "./pages/Dashboard";
@@ -19,46 +20,55 @@ function ProtectedRoute({ children }) {
 export default function App() {
   return (
     <BrowserRouter>
-      <Navbar />
+      <div className="min-h-screen flex flex-col bg-[#0b0d12] text-white">
 
-      <Routes>
+        <Navbar />
 
-        {/* Public Page */}
-        <Route path="/" element={<Portfolio />} />
+        {/* Pages */}
+        <main className="flex-grow">
+          <Routes>
 
-        {/* Auth Pages */}
-        <Route path="/login" element={<Login />} />
-        <Route path="/register" element={<Register />} />
+            {/* Public Page */}
+            <Route path="/" element={<Portfolio />} />
 
-        {/* Protected Pages */}
-        <Route
-          path="/dashboard"
-          element={
-            <ProtectedRoute>
-              <Dashboard />
-            </ProtectedRoute>
-          }
-        />
+            {/* Auth Pages */}
+            <Route path="/login" element={<Login />} />
+            <Route path="/register" element={<Register />} />
 
-        <Route
-          path="/rankings"
-          element={
-            <ProtectedRoute>
-              <Rankings />
-            </ProtectedRoute>
-          }
-        />
+            {/* Protected Pages */}
+            <Route
+              path="/dashboard"
+              element={
+                <ProtectedRoute>
+                  <Dashboard />
+                </ProtectedRoute>
+              }
+            />
 
-        <Route
-          path="/ai-advice"
-          element={
-            <ProtectedRoute>
-              <Suggestion />
-            </ProtectedRoute>
-          }
-        />
+            <Route
+              path="/rankings"
+              element={
+                <ProtectedRoute>
+                  <Rankings />
+                </ProtectedRoute>
+              }
+            />
 
-      </Routes>
+            <Route
+              path="/ai-advice"
+              element={
+                <ProtectedRoute>
+                  <Suggestion />
+                </ProtectedRoute>
+              }
+            />
+
+          </Routes>
+        </main>
+
+        <Footer />
+
+      </div>
     </BrowserRouter>
   );
 }
