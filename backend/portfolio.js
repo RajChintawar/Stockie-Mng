@@ -7,6 +7,17 @@ function calculatePortfolio(stocks, totalAmount) {
   if (!totalAmount || totalAmount <= 0) {
     throw new Error("Invalid total investment amount");
   }
+   const totalWeight = stocks.reduce(
+    (sum, s) => sum + Number(s.weightage),
+    0
+  );
+
+  if (totalWeight !== 100) {
+    throw new Error(
+      `Total allocation must be exactly 100%. Current: ${totalWeight}%`
+    );
+  }
+
 
   let stockResults = [];
   let totalCurrent = 0;
