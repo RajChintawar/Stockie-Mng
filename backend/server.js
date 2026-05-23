@@ -110,17 +110,28 @@ app.post("/save-portfolio", async (req, res) => {
 // ----------------------------------------------------------------
 // 6️⃣ GET RANKINGS — LOGIN REQUIRED
 // ----------------------------------------------------------------
-app.get("/get-rankings", auth, async (req, res) => {
+app.get("/get-rankings", async (req, res) => {
   try {
-    const users = await RankingUser.find().sort({ totalValue: -1 });
-    const ranked = rankingUsers(users);
+
+    const users =
+      await RankingUser.find()
+      .sort({ totalValue: -1 });
+
+    const ranked =
+      rankingUsers(users);
+
     res.json(ranked);
+
   } catch (err) {
+
     console.log(err);
-    res.json({ error: "Failed to fetch rankings" });
+
+    res.json({
+      error:
+        "Failed to fetch rankings",
+    });
   }
 });
-
 // ----------------------------------------------------------------
 // 7️⃣ AI Suggestion — LOGIN REQUIRED
 // ----------------------------------------------------------------
