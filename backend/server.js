@@ -137,7 +137,7 @@ app.get("/get-rankings", async (req, res) => {
 // ----------------------------------------------------------------
 const client = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
 
-app.post("/ai-suggest", auth, async (req, res) => {
+app.post("/ai-suggest", async (req, res) => {
   try {
     const { stocks, totalAmount } = req.body;
 
