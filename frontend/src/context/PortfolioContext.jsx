@@ -19,6 +19,9 @@ const [totalAmount, setTotalAmount] = useState(
     return saved ? JSON.parse(saved) : null;
   });
 
+
+ 
+
   // Save amount
   useEffect(() => {
     localStorage.setItem("totalAmount", Number(totalAmount));

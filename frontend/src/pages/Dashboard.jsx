@@ -20,6 +20,7 @@ import {
 export default function Dashboard() {
   const { portfolioResult, portfolioStocks } = useContext(PortfolioContext);
 
+
   if (!portfolioResult) {
     return (
       <div className="p-8 max-w-6xl mx-auto text-white">
