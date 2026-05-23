@@ -1,9 +1,18 @@
 import { useState, useContext } from "react";
+
+import {
+  Link,
+  useNavigate,
+} from "react-router-dom";
+
 import { AuthContext } from "../context/AuthContext";
-import { useNavigate } from "react-router-dom";
 
 export default function Register() {
-  const { login } = useContext(AuthContext);
+  const {
+    register,
+    googleLogin,
+  } = useContext(AuthContext);
+
   const navigate = useNavigate();
 
   const [form, setForm] = useState({
@@ -12,58 +21,123 @@ export default function Register() {
     password: "",
   });
 
-  const handleChange = (e) =>
-    setForm({ ...form, [e.target.name]: e.target.value });
+  const [error, setError] = useState("");
 
-  const registerUser = async () => {
-    const res = await fetch("https://stockie-mng-backend.onrender.com/auth/register", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(form),
+  const handleChange = (e) => {
+    setForm({
+      ...form,
+      [e.target.name]: e.target.value,
     });
+  };
 
-    const data = await res.json();
+  /* ---------------- REGISTER ---------------- */
 
-    if (data.error) return alert(data.error);
+  const handleRegister = async () => {
+    setError("");
 
-    alert("Account created! Now login 🔥");
-    navigate("/login");
+    try {
+      await register(
+        form.email,
+        form.password
+      );
+
+      navigate("/portfolio");
+
+    } catch (err) {
+      setError(
+        "Registration failed 💀"
+      );
+    }
+  };
+
+  /* ---------------- GOOGLE REGISTER ---------------- */
+
+  const handleGoogleRegister = async () => {
+    setError("");
+
+    try {
+      await googleLogin();
+
+      navigate("/portfolio");
+
+    } catch (err) {
+      setError(
+        "Google signup failed 😭"
+      );
+    }
   };
 
   return (
     <div className="p-6 max-w-md mx-auto text-white">
-      <h2 className="text-3xl font-bold mb-4">Register</h2>
 
+      <h2 className="text-3xl font-bold mb-4">
+        Register
+      </h2>
+
+      {error && (
+        <p className="text-red-400 mb-3">
+          {error}
+        </p>
+      )}
+
+      {/* NAME */}
       <input
         type="text"
         name="name"
         placeholder="Name"
-        className="p-3 w-full bg-[#1b1f27] rounded-xl mb-3"
+        value={form.name}
         onChange={handleChange}
+        className="p-3 w-full bg-[#1b1f27] rounded-xl mb-3"
       />
 
+      {/* EMAIL */}
       <input
         type="email"
         name="email"
         placeholder="Email"
-        className="p-3 w-full bg-[#1b1f27] rounded-xl mb-3"
+        value={form.email}
         onChange={handleChange}
+        className="p-3 w-full bg-[#1b1f27] rounded-xl mb-3"
       />
 
+      {/* PASSWORD */}
       <input
         type="password"
         name="password"
         placeholder="Password"
-        className="p-3 w-full bg-[#1b1f27] rounded-xl mb-3"
+        value={form.password}
         onChange={handleChange}
+        className="p-3 w-full bg-[#1b1f27] rounded-xl mb-3"
       />
 
+      {/* REGISTER BUTTON */}
       <button
-        onClick={registerUser}
-        className="bg-blue-600 px-5 py-2 rounded-xl"
+        onClick={handleRegister}
+        className="w-full bg-purple-600 p-3 rounded-xl hover:bg-purple-700"
       >
         Create Account
       </button>
+
+      {/* GOOGLE SIGNUP */}
+      <button
+        onClick={handleGoogleRegister}
+        className="w-full bg-white text-black p-3 rounded-xl mt-3 font-semibold hover:bg-gray-200"
+      >
+        Continue with Google
+      </button>
+
+      {/* LOGIN LINK */}
+      <p className="mt-5 text-gray-400">
+        Already have an account?{" "}
+
+        <Link
+          to="/login"
+          className="text-blue-400"
+        >
+          Login
+        </Link>
+      </p>
+
     </div>
   );
 }

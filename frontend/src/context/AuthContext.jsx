@@ -1,43 +1,114 @@
-import { createContext, useState, useEffect } from "react";
+import {
+  createContext,
+  useEffect,
+  useState,
+} from "react";
+
+import {
+  signInWithPopup,
+  signOut,
+  onAuthStateChanged,
+  GoogleAuthProvider,
+  signInWithEmailAndPassword,
+  createUserWithEmailAndPassword,
+  sendPasswordResetEmail,
+} from "firebase/auth";
+
+import {
+  auth,
+  googleProvider,
+} from "../firebase";
 
 export const AuthContext = createContext();
 
 export default function AuthProvider({ children }) {
-  const [user, setUser] = useState(null);       // { name, email }
-  const [token, setToken] = useState(null);
+  const [user, setUser] = useState(null);
+  const [loading, setLoading] = useState(true);
 
-  // Load token from localStorage on refresh
+  /* ---------------- GOOGLE LOGIN ---------------- */
+
+  const googleLogin = async () => {
+    await signInWithPopup(auth, googleProvider);
+  };
+
+  /* ---------------- EMAIL LOGIN ---------------- */
+
+  const login = async (email, password) => {
+    await signInWithEmailAndPassword(
+      auth,
+      email,
+      password
+    );
+  };
+
+  /* ---------------- REGISTER ---------------- */
+
+  const register = async (email, password) => {
+    await createUserWithEmailAndPassword(
+      auth,
+      email,
+      password
+    );
+  };
+
+  /* ---------------- FORGOT PASSWORD ---------------- */
+
+  const forgotPassword = async (email) => {
+    await sendPasswordResetEmail(auth, email);
+  };
+
+  /* ---------------- LOGOUT ---------------- */
+
+  const logout = async () => {
+
+  /* CLEAR OLD PORTFOLIO */
+
+  localStorage.removeItem(
+    "portfolioStocks"
+  );
+
+  localStorage.removeItem(
+    "portfolioResult"
+  );
+
+  localStorage.removeItem(
+    "totalAmount"
+  );
+
+  localStorage.removeItem(
+    "pf_username"
+  );
+
+  await signOut(auth);
+};
+
+  /* ---------------- AUTH PERSISTENCE ---------------- */
+
   useEffect(() => {
-    const savedToken = localStorage.getItem("token");
-    const savedUser = localStorage.getItem("user");
+    const unsubscribe = onAuthStateChanged(
+      auth,
+      (currentUser) => {
+        setUser(currentUser);
+        setLoading(false);
+      }
+    );
 
-    if (savedToken && savedUser) {
-      setToken(savedToken);
-      setUser(JSON.parse(savedUser));
-    }
+    return () => unsubscribe();
   }, []);
 
-  // Login Function
-  const login = (data) => {
-    localStorage.setItem("token", data.token);
-    localStorage.setItem("user", JSON.stringify({ name: data.name }));
-
-    setToken(data.token);
-    setUser({ name: data.name });
-  };
-
-  // Logout Function
-  const logout = () => {
-    localStorage.removeItem("token");
-    localStorage.removeItem("user");
-
-    setUser(null);
-    setToken(null);
-  };
-
   return (
-    <AuthContext.Provider value={{ user, token, login, logout }}>
-      {children}
+    <AuthContext.Provider
+  value={{
+    user,
+    loading,
+    login,
+    register,
+    googleLogin,
+    forgotPassword,
+    logout,
+  }}
+>
+      {!loading && children}
     </AuthContext.Provider>
   );
 }
