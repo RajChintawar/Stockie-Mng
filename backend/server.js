@@ -138,27 +138,82 @@ app.get("/get-rankings", async (req, res) => {
 const client = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
 
 app.post("/ai-suggest", async (req, res) => {
+
   try {
-    const { stocks, totalAmount } = req.body;
+
+    console.log("AI ROUTE HIT");
+
+    const { stocks, totalAmount } =
+      req.body;
+
+    console.log(
+      "BODY:",
+      stocks,
+      totalAmount
+    );
 
     const prompt = `
 Investment Amount: ₹${totalAmount}
-User Portfolio: ${JSON.stringify(stocks, null, 2)}
 
-Give risk analysis, improvements, diversification and final clear action plan.
+User Portfolio:
+${JSON.stringify(stocks, null, 2)}
+
+Give:
+- risk analysis
+- improvements
+- diversification advice
+- final action plan
 `;
 
-    const completion = await client.chat.completions.create({
-      model: "gpt-4o-mini",
-      messages: [{ role: "user", content: prompt }],
+    const completion =
+      await client.chat.completions.create({
+        model: "gpt-4o-mini",
+
+        messages: [
+          {
+            role: "user",
+            content: prompt,
+          },
+        ],
+      });
+
+    console.log(
+      "OPENAI RESPONSE RECEIVED"
+    );
+
+    res.json({
+      suggestion:
+        completion?.choices?.[0]
+          ?.message?.content,
     });
 
-    res.json({ suggestion: completion.choices[0].message.content });
   } catch (err) {
-console.log(
-  "AI ERROR FULL:",
-  err
-);    res.status(500).json({ error: "AI Suggestion failed" });
+
+    console.log(
+      "FULL AI ERROR:"
+    );
+
+    console.log(err);
+
+    console.log(
+      "ERROR MESSAGE:",
+      err?.message
+    );
+
+    console.log(
+      "ERROR STATUS:",
+      err?.status
+    );
+
+    console.log(
+      "ERROR RESPONSE:",
+      err?.response?.data
+    );
+
+    res.status(500).json({
+      error:
+        "AI Suggestion failed",
+    });
   }
 });
 
