@@ -155,8 +155,10 @@ Give risk analysis, improvements, diversification and final clear action plan.
 
     res.json({ suggestion: completion.choices[0].message.content });
   } catch (err) {
-    console.log("AI ERROR:", err);
-    res.status(500).json({ error: "AI Suggestion failed" });
+console.log(
+  "AI ERROR FULL:",
+  err
+);    res.status(500).json({ error: "AI Suggestion failed" });
   }
 });
 
