@@ -276,6 +276,16 @@ app.get("/stocks/top", (req, res) => {
 });
 
 
+//TESTING HIT render
+
+
+app.get("/test-ai", (req, res) => {
+  console.log("TEST ROUTE HIT");
+
+  res.json({
+    success: true,
+  });
+});
 
 
 
