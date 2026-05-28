@@ -27,6 +27,9 @@ export default function Navbar() {
           <Link to="/dashboard" className="hover:text-white">Dashboard</Link>
           <Link to="/rankings" className="hover:text-white">Rankings</Link>
           <Link to="/ai-advice" className="hover:text-white">AI Advice</Link>
+          <Link to="/about" className="hover:text-white" >
+  About Mirrafolio
+</Link>
 
           {/* SHOW LOGIN/REGISTER ONLY WHEN LOGGED OUT */}
           {!user && (

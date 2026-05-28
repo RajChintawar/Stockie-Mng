@@ -12,8 +12,10 @@ import Dashboard from "./pages/Dashboard";
 import Portfolio from "./pages/Portfolio";
 import Rankings from "./pages/Rankings";
 import Suggestion from "./pages/Suggestion";
+import About from "./pages/About";
 import Login from "./pages/Login";
 import Register from "./pages/Register";
+
 
 import { AuthContext } from "./context/AuthContext";
 import { useContext } from "react";
@@ -162,6 +164,15 @@ export default function App() {
                 </ProtectedRoute>
               }
             />
+
+            <Route
+  path="/about"
+  element={
+    <ProtectedRoute>
+      <About />
+    </ProtectedRoute>
+  }
+/>
 
             {/* INVALID ROUTES */}
             <Route
