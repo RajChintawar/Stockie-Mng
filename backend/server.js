@@ -8,6 +8,9 @@ const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
 
 console.log("OPENAI LOADED?", process.env.OPENAI_API_KEY ? "YES" : "NO");
+console.log(
+  "🔥 NEW BACKEND VERSION RUNNING"
+);
 
 const app = express();
 app.use(express.json());
@@ -280,10 +283,13 @@ app.get("/stocks/top", (req, res) => {
 
 
 app.get("/test-ai", (req, res) => {
+
   console.log("TEST ROUTE HIT");
 
   res.json({
     success: true,
+    message:
+      "Backend updated correctly 😭🔥",
   });
 });
 
