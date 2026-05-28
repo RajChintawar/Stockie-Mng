@@ -144,32 +144,36 @@ app.post("/ai-suggest", async (req, res) => {
 
   try {
 
-    console.log("AI ROUTE HIT");
+    console.log("🔥 AI ROUTE HIT");
 
     const { stocks, totalAmount } =
       req.body;
 
     console.log(
-      "BODY:",
-      stocks,
-      totalAmount
+      "REQ BODY:",
+      req.body
     );
 
     const prompt = `
 Investment Amount: ₹${totalAmount}
 
-User Portfolio:
+Portfolio:
 ${JSON.stringify(stocks, null, 2)}
 
 Give:
 - risk analysis
-- improvements
 - diversification advice
+- improvements
 - final action plan
 `;
 
+    console.log(
+      "PROMPT CREATED"
+    );
+
     const completion =
       await client.chat.completions.create({
+
         model: "gpt-4o-mini",
 
         messages: [
@@ -181,7 +185,7 @@ Give:
       });
 
     console.log(
-      "OPENAI RESPONSE RECEIVED"
+      "✅ OPENAI RESPONSE RECEIVED"
     );
 
     res.json({
@@ -193,24 +197,24 @@ Give:
   } catch (err) {
 
     console.log(
-      "FULL AI ERROR:"
+      "❌ FULL AI ERROR:"
     );
 
     console.log(err);
 
     console.log(
-      "ERROR MESSAGE:",
+      "MESSAGE:",
       err?.message
     );
 
     console.log(
-      "ERROR STATUS:",
+      "STATUS:",
       err?.status
     );
 
     console.log(
-      "ERROR RESPONSE:",
-      err?.response?.data
+      "STACK:",
+      err?.stack
     );
 
     res.status(500).json({
