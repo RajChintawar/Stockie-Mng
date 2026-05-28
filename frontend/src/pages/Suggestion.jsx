@@ -86,13 +86,16 @@ export default function Suggestion() {
 
       })
 
-      .catch(() => {
+      .then((data) => {
 
-        alert(
-          "Backend died 💀🔥"
-        );
+  if (data.error) {
+    alert(data.error);
+    return;
+  }
 
-      })
+  setSuggestion(data.suggestion);
+
+})
 
       .finally(() => {
 
