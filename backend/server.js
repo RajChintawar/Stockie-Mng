@@ -138,8 +138,12 @@ app.get("/get-rankings", async (req, res) => {
 // ----------------------------------------------------------------
 // 7️⃣ AI Suggestion — LOGIN REQUIRED
 // ----------------------------------------------------------------
-const client = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
+const client = new OpenAI({
+  apiKey: process.env.GROQ_API_KEY,
 
+  baseURL:
+    "https://api.groq.com/openai/v1",
+});
 app.post("/ai-suggest", async (req, res) => {
 
   try {
@@ -174,7 +178,7 @@ Give:
     const completion =
       await client.chat.completions.create({
 
-        model: "gpt-4o-mini",
+        model: "llama-3.3-70b-versatile",
 
         messages: [
           {
