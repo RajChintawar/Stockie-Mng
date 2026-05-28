@@ -86,6 +86,9 @@ export default function Navbar() {
           <Link onClick={() => setOpen(false)} to="/ai-advice" className="block">
             AI Advice
           </Link>
+          <Link onClick={() => setOpen(false)} to="/about" className="block">
+            About Mirrafolio
+          </Link>
 
           {!user && (
             <>
